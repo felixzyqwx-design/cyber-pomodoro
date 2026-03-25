@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER POMODORO // 赛博番茄钟</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        :root {
+            --bg-dark: #020617;
+            --bg-surface: #0f172a;
+            --neon-pink: #ec4899;
+            --neon-cyan: #0ea5e9;
+            --neon-magenta: #d946ef;
+            --neon-purple: #711c91;
+            --neon-blue: #133e7c;
+            --text-glow: #ea00d9;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--neon-purple) 50%, var(--bg-dark) 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 20px;
+            box-shadow: 
+                0 0 20px var(--neon-cyan),
+                0 0 40px var(--neon-cyan),
+                inset 0 0 20px rgba(14, 165, 233, 0.1);
+            position: relative;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-cyan), var(--neon-magenta));
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0.5;
+            animation: borderGlow 3s linear infinite;
+        }
+        
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--neon-pink);
+            text-shadow: 
+                0 0 10px var(--neon-pink),
+                0 0 20px var(--neon-pink),
+                0 0 40px var(--neon-pink);
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+        }
+        
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+        
+        .timer-display {
+            font-size: 6rem;
+            font-weight: 700;
+            color: var(--text-glow);
+            text-shadow: 
+                0 0 10px var(--text-glow),
+                0 0 20px var(--text-glow),
+                0 0 40px var(--text-glow),
+                0 0 80px var(--text-glow);
+            margin: 30px 0;
+            letter-spacing: 8px;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .timer-display.paused {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .status {
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            margin-bottom: 30px;
+            min-height: 30px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 15px 30px;
+            border: 2px solid;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: transparent;
+        }
+        
+        .btn-start {
+            color: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+        
+        .btn-start:hover {
+            background: var(--neon-cyan);
+            color: var(--bg-dark);
+            box-shadow: 0 0 30px var(--neon-cyan);
+        }
+        
+        .btn-pause {
+            color: var(--neon-magenta);
+            border-color: var(--neon-magenta);
+            box-shadow: 0 0 10px var(--neon-magenta);
+        }
+        
+        .btn-pause:hover {
+            background: var(--neon-magenta);
+            color: var(--bg-dark);
+            box-shadow: 0 0 30px var(--neon-magenta);
+        }
+        
+        .btn-reset {
+            color: var(--neon-pink);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+        
+        .btn-reset:hover {
+            background: var(--neon-pink);
+            color: var(--bg-dark);
+            box-shadow: 0 0 30px var(--neon-pink);
+        }
+        
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            animation: glitch1 2s infinite linear alternate-reverse;
+            color: var(--neon-cyan);
+            z-index: -1;
+        }
+        
+        .glitch::after {
+            animation: glitch2 3s infinite linear alternate-reverse;
+            color: var(--neon-pink);
+            z-index: -2;
+        }
+        
+        @keyframes glitch1 {
+            0%, 90%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, -2px); }
+            80% { transform: translate(2px, 2px); }
+        }
+        
+        @keyframes glitch2 {
+            0%, 90%, 100% { transform: translate(0); }
+            20% { transform: translate(2px, -2px); }
+            40% { transform: translate(-2px, 2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(-2px, -2px); }
+        }
+        
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 0, 0, 0.1) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-cyan);
+        }
+        
+        .corner-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .corner-tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+        .corner-bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+        .corner-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    
+    <div class="container">
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+        
+        <h1 class="title glitch" data-text="CYBER POMODORO">CYBER POMODORO</h1>
+        <p class="subtitle">// NEURO-ENHANCED FOCUS PROTOCOL //</p>
+        
+        <div class="timer-display" id="timer">25:00</div>
+        
+        <div class="status" id="status">SYSTEM READY // WAITING FOR INPUT</div>
+        
+        <div class="controls">
+            <button class="btn btn-start" id="startBtn" onclick="startTimer()">INITIATE</button>
+            <button class="btn btn-pause" id="pauseBtn" onclick="pauseTimer()" style="display:none;">SUSPEND</button>
+            <button class="btn btn-reset" id="resetBtn" onclick="resetTimer()">RESET</button>
+        </div>
+    </div>
+    
+    <script>
+        let timeLeft = 25 * 60; // 25 minutes in seconds
+        let timerId = null;
+        let isRunning = false;
+        
+        const timerDisplay = document.getElementById('timer');
+        const statusDisplay = document.getElementById('status');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        
+        function updateDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                startBtn.style.display = 'none';
+                pauseBtn.style.display = 'inline-block';
+                timerDisplay.classList.remove('paused');
+                statusDisplay.textContent = '// FOCUS PROTOCOL ACTIVE //';
+                
+                timerId = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateDisplay();
+                    } else {
+                        completeTimer();
+                    }
+                }, 1000);
+            }
+        }
+        
+        function pauseTimer() {
+            if (isRunning) {
+                isRunning = false;
+                clearInterval(timerId);
+                startBtn.style.display = 'inline-block';
+                pauseBtn.style.display = 'none';
+                timerDisplay.classList.add('paused');
+                statusDisplay.textContent = '// PROTOCOL SUSPENDED //';
+            }
+        }
+        
+        function resetTimer() {
+            isRunning = false;
+            clearInterval(timerId);
+            timeLeft = 25 * 60;
+            updateDisplay();
+            startBtn.style.display = 'inline-block';
+            pauseBtn.style.display = 'none';
+            timerDisplay.classList.remove('paused');
+            statusDisplay.textContent = 'SYSTEM READY // WAITING FOR INPUT';
+        }
+        
+        function completeTimer() {
+            isRunning = false;
+            clearInterval(timerId);
+            startBtn.style.display = 'inline-block';
+            pauseBtn.style.display = 'none';
+            timerDisplay.classList.remove('paused');
+            statusDisplay.textContent = '// PROTOCOL COMPLETE //';
+            
+            // Visual alert
+            timerDisplay.style.animation = 'pulse 0.5s ease-in-out 3';
+            
+            // Browser notification
+            if (Notification.permission === 'granted') {
+                new Notification('CYBER POMODORO', {
+                    body: 'FOCUS PROTOCOL COMPLETE // TAKE A BREAK',
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍅</text></svg>'
+                });
+            } else {
+                alert('⚡ CYBER POMODORO ⚡\n\nFOCUS PROTOCOL COMPLETE\nTIME TO RECHARGE');
+            }
+            
+            setTimeout(() => {
+                timerDisplay.style.animation = '';
+            }, 1500);
+        }
+        
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (isRunning) {
+                    pauseTimer();
+                } else {
+                    startTimer();
+                }
+            } else if (e.code === 'KeyR') {
+                resetTimer();
+            }
+        });
+        
+        updateDisplay();
+    </script>
+</body>
+</html>
