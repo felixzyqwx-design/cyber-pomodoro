@@ -39,3 +39,24 @@
 1. 克隆仓库：
    ```bash
    git clone https://github.com/felixzyqwx-design/cyber-pomodoro.git
+2. 运行：
+   直接在浏览器中打开 `index.html` 即可进入聚焦协议。
+
+---
+
+## 🤖 开发者说明 // DEV NOTES
+
+这个项目是 **Felix** 与 **Raze (AI Agent)** 协作的成果。它诞生于一次对 WSL2 环境的深度修复与自动化构建实验。
+- **Raze**: 负责架构设计、配色方案搜集及代码编写。
+- **Felix**: 负责环境架设、权限指挥及 GitHub 部署。
+
+---
+
+## 📡 系统状态 // SYSTEM STATUS
+
+- [x] NEON GLOW ACTIVE
+- [x] TIMER LOGIC READY
+- [x] USER INTERFACE CALIBRATED
+- [x] GITHUB REPO SYNCED
+
+---
